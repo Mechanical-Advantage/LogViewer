@@ -476,11 +476,12 @@ export default class RobotManager extends ObjectManager<
 
         // Update length
         const newScale = new THREE.Vector3(
-          length,
-          line.weight * this.MECHANISM_WIDTH_PER_WEIGHT,
+          object.mechanism.axis == "x" ? length : line.weight * this.MECHANISM_WIDTH_PER_WEIGHT,
+          object.mechanism.axis == "x" ? line.weight * this.MECHANISM_WIDTH_PER_WEIGHT : length,
           line.weight * this.MECHANISM_WIDTH_PER_WEIGHT
         );
-        const newTranslation = new THREE.Vector3(length / 2, 0, 0);
+        const newTranslation =
+          object.mechanism.axis == "x" ? new THREE.Vector3(length / 2, 0, 0) : new THREE.Vector3(0, length / 2, 0);
         if (!newScale.equals(meshEntry.scale) || !newTranslation.equals(meshEntry.translation)) {
           meshEntry.geometry.translate(-meshEntry.translation.x, -meshEntry.translation.y, -meshEntry.translation.z);
           meshEntry.geometry.scale(1 / meshEntry.scale.x, 1 / meshEntry.scale.y, 1 / meshEntry.scale.z);
@@ -503,9 +504,13 @@ export default class RobotManager extends ObjectManager<
               this.dummyRobotPose.rotation.setFromQuaternion(rotation3dToQuaternion(robotPose.rotation));
               this.dummyRobotPose.position.set(...robotPose.translation);
 
-              this.dummyUserPose.position.set(line.start[0] - object.mechanism!.dimensions[0] / 2, 0, line.start[1]);
-              this.dummyUserPose.rotation.set(0, -angle, 0);
-
+              if (object.mechanism?.axis == "x") {
+                this.dummyUserPose.position.set(line.start[0] - object.mechanism!.dimensions[0] / 2, 0, line.start[1]);
+                this.dummyUserPose.rotation.set(0, -angle, 0);
+              } else {
+                this.dummyUserPose.position.set(0, line.start[0] - object.mechanism!.dimensions[0] / 2, line.start[1]);
+                this.dummyUserPose.rotation.set(angle, 0, 0);
+              }
               return {
                 translation: this.dummyUserPose.getWorldPosition(new THREE.Vector3()).toArray(),
                 rotation: quaternionToRotation3d(this.dummyUserPose.getWorldQuaternion(new THREE.Quaternion()))

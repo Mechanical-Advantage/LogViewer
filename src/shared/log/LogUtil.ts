@@ -471,6 +471,7 @@ export type MechanismState = {
   backgroundColor: string;
   dimensions: [number, number];
   lines: MechanismLine[];
+  axis: string;
 };
 
 export type MechanismLine = {
@@ -480,7 +481,7 @@ export type MechanismLine = {
   weight: number;
 };
 
-export function getMechanismState(log: Log, key: string, time: number): MechanismState | null {
+export function getMechanismState(log: Log, key: string, time: number, axis: string = "x"): MechanismState | null {
   // Get general config
   let backgroundColor = getOrDefault(log, key + "/backgroundColor", LoggableType.String, time, null);
   let dimensions = getOrDefault(log, key + "/dims", LoggableType.NumberArray, time, null);
@@ -565,7 +566,8 @@ export function getMechanismState(log: Log, key: string, time: number): Mechanis
   return {
     backgroundColor: backgroundColor,
     dimensions: dimensions,
-    lines: lines
+    lines: lines,
+    axis: axis
   };
 }
 
@@ -587,7 +589,8 @@ export function mergeMechanismStates(states: MechanismState[]): MechanismState {
   return {
     backgroundColor: states[0].backgroundColor,
     dimensions: [newWidth, newHeight],
-    lines: lines
+    lines: lines,
+    axis: states[0].axis
   };
 }
 

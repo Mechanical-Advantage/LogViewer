@@ -197,7 +197,17 @@ const ThreeDimensionController_Config: SourceListConfig = {
       color: "#888888",
       sourceTypes: ["Mechanism2d"],
       showDocs: true,
-      options: [],
+      options: [
+        {
+          key: "axis",
+          display: "Axis",
+          showInTypeName: true,
+          values: [
+            { key: "x", display: "XZ axis" },
+            { key: "y", display: "YZ axis" }
+          ]
+        }
+      ],
       childOf: "robot"
     },
     {
