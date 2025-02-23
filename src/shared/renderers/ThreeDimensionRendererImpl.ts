@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import WorkerManager from "../../hub/WorkerManager";
 import {
+  AdvantageScopeAssets,
   Config3dField,
   Config3d_Rotation,
   DEFAULT_DRIVER_STATIONS,
@@ -118,7 +119,7 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
   private lastDevicePixelRatio: number | null = null;
   private lastIsDark: boolean | null = null;
   private lastCommandString: string = "";
-  private lastAssetsString: string = "";
+  private lastAssets: AdvantageScopeAssets | null = null;
   private lastFieldTitle: string = "";
   private keysPressed: Set<string> = new Set();
 
@@ -538,7 +539,10 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
     let commandString = JSON.stringify(command);
     let assetsString = JSON.stringify(window.assets);
     let isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    let newAssets = assetsString !== this.lastAssetsString;
+    let newAssets = assetsString !== JSON.stringify(this.lastAssets);
+    let newFieldAssets = JSON.stringify(window.assets?.field3ds) !== JSON.stringify(this.lastAssets?.field3ds);
+    let newRobotAssets = JSON.stringify(window.assets?.robots) !== JSON.stringify(this.lastAssets?.robots);
+
     if (
       this.renderer.domElement.clientWidth !== this.lastWidth ||
       this.renderer.domElement.clientHeight !== this.lastHeight ||
@@ -554,7 +558,7 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
       this.lastDevicePixelRatio = window.devicePixelRatio;
       this.lastIsDark = isDark;
       this.lastCommandString = commandString;
-      this.lastAssetsString = assetsString;
+      this.lastAssets = window.assets;
       this.shouldRender = true;
     }
 
@@ -601,7 +605,7 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
     }
 
     // Update field
-    if (fieldTitle !== this.lastFieldTitle || newAssets) {
+    if (fieldTitle !== this.lastFieldTitle || newFieldAssets) {
       this.shouldLoadNewField = true;
 
       // Reset camera if switching between axis and non-axis or if using DS camera
@@ -731,7 +735,7 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
       } else {
         entry.active = true;
       }
-      if (newAssets && (entry.type === "robot" || entry.type === "ghost")) {
+      if (newRobotAssets && (entry.type === "robot" || entry.type === "ghost")) {
         (entry.manager as RobotManager).newAssets();
       }
       entry.manager.setObjectData(object);
