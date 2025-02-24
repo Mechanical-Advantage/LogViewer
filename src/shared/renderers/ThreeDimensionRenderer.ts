@@ -1,7 +1,7 @@
 import { AnnotatedPose3d, SwerveState } from "../geometry";
 import { MechanismState } from "../log/LogUtil";
 import TabRenderer from "./TabRenderer";
-import ThreeDimensionRendererImpl from "./ThreeDimensionRendererImpl";
+import ThreeDimensionRendererImpl, { StreamSettings } from "./ThreeDimensionRendererImpl";
 
 export default class ThreeDimensionRenderer implements TabRenderer {
   private CANVAS: HTMLCanvasElement;
@@ -45,6 +45,11 @@ export default class ThreeDimensionRenderer implements TabRenderer {
   /** Updates the orbit FOV. */
   setFov(fov: number) {
     this.implementation?.setFov(fov);
+  }
+
+  /** Updates stream settings. */
+  setStreamSettings(settings: StreamSettings) {
+    this.implementation?.setStreamSettings(settings);
   }
 
   private updateImplementation() {

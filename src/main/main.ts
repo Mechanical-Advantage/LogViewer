@@ -34,6 +34,7 @@ import Preferences from "../shared/Preferences";
 import { SourceListConfig, SourceListItemState, SourceListTypeMemory } from "../shared/SourceListConfig";
 import TabType, { getAllTabTypes, getDefaultTabTitle, getTabAccelerator, getTabIcon } from "../shared/TabType";
 import { BUILD_DATE, COPYRIGHT, DISTRIBUTOR, Distributor } from "../shared/buildConstants";
+import { StreamSettings } from "../shared/renderers/ThreeDimensionRendererImpl";
 import { MAX_RECENT_UNITS, NoopUnitConversion, UnitConversionPreset } from "../shared/units";
 import {
   AKIT_PATH_INPUT,
@@ -66,6 +67,7 @@ import {
   TYPE_MEMORY_FILENAME,
   WINDOW_ICON
 } from "./Constants";
+import { MJPEGServer } from "./MJPEGServer";
 import StateTracker, { ApplicationState, SatelliteWindowState, WindowState } from "./StateTracker";
 import UpdateChecker from "./UpdateChecker";
 import { VideoProcessor } from "./VideoProcessor";
@@ -1054,7 +1056,13 @@ async function handleHubMessage(window: BrowserWindow, message: NamedMessage) {
       break;
 
     case "ask-3d-camera":
-      select3DCameraPopup(window, message.data.options, message.data.selectedIndex, message.data.fov);
+      select3DCameraPopup(
+        window,
+        message.data.options,
+        message.data.selectedIndex,
+        message.data.fov,
+        message.data.streamSettings
+      );
       break;
 
     case "export-console":
@@ -1191,6 +1199,10 @@ async function handleHubMessage(window: BrowserWindow, message: NamedMessage) {
       XRServer.setHubCommand(message.data);
       break;
 
+    case "update-mjpeg-frame":
+      MJPEGServer.update(message.data.stream_id, message.data.dataUrl);
+      break;
+
     default:
       console.warn("Unknown message from hub renderer process", message);
       break;
@@ -1234,7 +1246,13 @@ function newTabPopup(window: BrowserWindow) {
   });
 }
 
-function select3DCameraPopup(window: BrowserWindow, options: string[], selectedIndex: number, fov: number) {
+function select3DCameraPopup(
+  window: BrowserWindow,
+  options: string[],
+  selectedIndex: number,
+  fov: number,
+  stream: StreamSettings
+) {
   const cameraMenu = new Menu();
   cameraMenu.append(
     new MenuItem({
@@ -1325,6 +1343,17 @@ function select3DCameraPopup(window: BrowserWindow, options: string[], selectedI
       click() {
         createEditFovWindow(window, fov, (newFov) => {
           sendMessage(window, "edit-fov", newFov);
+        });
+      }
+    })
+  );
+  cameraMenu.append(
+    new MenuItem({
+      label: "Set Stream Settings...",
+      click() {
+        createEditStreamWindow(window, stream, (oldStream, newStream) => {
+          MJPEGServer.updateStreamIds(oldStream, newStream);
+          sendMessage(window, "edit-stream-settings", newStream);
         });
       }
     })
@@ -2712,6 +2741,50 @@ function createEditFovWindow(parentWindow: Electron.BrowserWindow, fov: number, 
 }
 
 /**
+ * Creates a new window to edit streaming settings.
+ * @param parentWindow The parent window to use for alignment
+ * @param stream Current stream settings.
+ * @param callback Window callback.
+ */
+function createEditStreamWindow(
+  parentWindow: Electron.BrowserWindow,
+  stream: StreamSettings,
+  callback: (oldStream: StreamSettings, newStream: StreamSettings) => void
+) {
+  const editStreamWindow = new BrowserWindow({
+    width: 300,
+    height: 140,
+    useContentSize: true,
+    resizable: false,
+    icon: WINDOW_ICON,
+    show: false,
+    parent: parentWindow,
+    modal: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js")
+    }
+  });
+
+  // Finish setup
+  editStreamWindow.setMenu(null);
+  editStreamWindow.once("ready-to-show", parentWindow.show);
+  editStreamWindow.webContents.on("dom-ready", () => {
+    // Create ports on reload
+    const { port1, port2 } = new MessageChannelMain();
+    editStreamWindow.webContents.postMessage("port", null, [port1]);
+    port2.postMessage(stream);
+    port2.on("message", (event) => {
+      editStreamWindow.destroy();
+      callback(event.data.oldStream, event.data.newStream);
+    });
+    editStreamWindow.on("blur", () => port2.postMessage({ isFocused: false }));
+    editStreamWindow.on("focus", () => port2.postMessage({ isFocused: true }));
+    port2.start();
+  });
+  editStreamWindow.loadFile(path.join(__dirname, "../www/editStream.html"));
+}
+
+/**
  * Creates a new window for export options.
  * @param parentWindow The parent window to use for alignment
  * @param supportsAkit Whether AdvantageKit timestamps are supported
@@ -2881,7 +2954,13 @@ function createSatellite(
           break;
 
         case "ask-3d-camera":
-          select3DCameraPopup(satellite, message.data.options, message.data.selectedIndex, message.data.fov);
+          select3DCameraPopup(
+            satellite,
+            message.data.options,
+            message.data.selectedIndex,
+            message.data.fov,
+            message.data.streamSettings
+          );
           break;
 
         case "add-table-range":
@@ -2907,6 +2986,10 @@ function createSatellite(
 
         case "open-link":
           shell.openExternal(message.data);
+          break;
+
+        case "update-mjpeg-frame":
+          MJPEGServer.update(message.data.stream_id, message.data.dataUrl);
           break;
 
         default:

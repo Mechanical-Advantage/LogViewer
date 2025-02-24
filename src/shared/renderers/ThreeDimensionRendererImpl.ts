@@ -121,6 +121,11 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
   private lastAssetsString: string = "";
   private lastFieldTitle: string = "";
   private keysPressed: Set<string> = new Set();
+  private streamSettings: StreamSettings = {
+    streamEnable: false,
+    streamId: "",
+    streamQuality: 0.75
+  };
 
   static {
     CameraControls.install({ THREE: THREE });
@@ -166,7 +171,8 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
         window.sendMainMessage("ask-3d-camera", {
           options: cameraList,
           selectedIndex: this.cameraIndex >= cameraList.length ? CameraIndexEnum.OrbitField : this.cameraIndex,
-          fov: this.orbitFov
+          fov: this.orbitFov,
+          streamSettings: this.streamSettings
         });
       }
       startPx = null;
@@ -272,7 +278,8 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
       cameraIndex: this.cameraIndex,
       orbitFov: this.orbitFov,
       cameraPosition: [position.x, position.y, position.z],
-      cameraTarget: [target.x, target.y, target.z]
+      cameraTarget: [target.x, target.y, target.z],
+      streamSettings: this.streamSettings
     };
   }
 
@@ -297,6 +304,9 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
         ...(state.cameraTarget as [number, number, number])
       );
     }
+    if ("streamSettings" in state && typeof state.streamSettings === "object") {
+      this.streamSettings = state.streamSettings as StreamSettings;
+    }
     this.lastCameraIndex = this.cameraIndex; // Don't reset camera position
     this.shouldResetCamera = false;
     this.shouldRender = true;
@@ -312,6 +322,11 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
   setFov(fov: number) {
     this.orbitFov = clampValue(fov, this.MIN_ORBIT_FOV, this.MAX_ORBIT_FOV);
     this.shouldRender = true;
+  }
+
+  /** Updates stream settings. */
+  setStreamSettings(settings: StreamSettings) {
+    this.streamSettings = settings;
   }
 
   stop() {}
@@ -558,8 +573,8 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
       this.shouldRender = true;
     }
 
-    // Exit if not visible
-    if (this.canvas.getBoundingClientRect().width === 0) {
+    // Exit if not visible, but continue if stream is enabled
+    if (this.canvas.getBoundingClientRect().width === 0 && !this.streamSettings.streamEnable) {
       return; // Continue trying to render
     }
 
@@ -948,6 +963,14 @@ export default class ThreeDimensionRendererImpl implements TabRenderer {
     this.renderer.setPixelRatio(devicePixelRatio);
     this.renderer.render(this.scene, this.camera);
     this.cssRenderer.render(this.scene, this.camera);
+
+    if (this.streamSettings.streamEnable) {
+      let dataUrl = this.canvas.toDataURL("image/jpeg", this.streamSettings.streamQuality);
+      window.sendMainMessage("update-mjpeg-frame", {
+        stream_id: this.streamSettings.streamId,
+        dataUrl: dataUrl
+      });
+    }
   }
 }
 
@@ -1001,3 +1024,8 @@ export function rotation3dToQuaternion(input: Rotation3d): THREE.Quaternion {
 export function quaternionToRotation3d(input: THREE.Quaternion): Rotation3d {
   return [input.w, input.x, input.y, input.z];
 }
+export type StreamSettings = {
+  streamEnable: boolean;
+  streamId: string;
+  streamQuality: number;
+};

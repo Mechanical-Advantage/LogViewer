@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="prompts.css" />
+    <script type="module" src="../bundles/editStream.js"></script>
+    <title>Edit Stream Settings &mdash; AdvantageScope</title>
+  </head>
+
+  <body>
+    <table>
+      <tbody>
+        <tr>
+          <td class="label">Enable Streaming</td>
+          <td class="input" tabindex="-1">
+            <input type="checkbox" id="stream_enable" />
+          </td>
+        </tr>
+        <tr>
+          <td class="label">Stream ID</td>
+          <td class="input" tabindex="-1">
+            <input type="text" id="stream_id" />
+          </td>
+        </tr>
+        <tr>
+          <td class="label">Quality (0.0 ~ 1.0)</td>
+          <td class="input" tabindex="-1">
+            <input type="number" id="stream_quality" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button id="exit" tabindex="-1">
+      <img src="symbols/xmark.svg" />
+    </button>
+    <button id="confirm" tabindex="-1">
+      <img src="symbols/checkmark.svg" />
+    </button>
+  </body>
+</html>

@@ -15,6 +15,7 @@ import SwerveRenderer from "../shared/renderers/SwerveRenderer";
 import TabRenderer, { NoopRenderer } from "../shared/renderers/TabRenderer";
 import TableRenderer from "../shared/renderers/TableRenderer";
 import ThreeDimensionRenderer from "../shared/renderers/ThreeDimensionRenderer";
+import { StreamSettings } from "../shared/renderers/ThreeDimensionRendererImpl";
 import VideoRenderer from "../shared/renderers/VideoRenderer";
 import { UnitConversionPreset } from "../shared/units";
 import ScrollSensor from "./ScrollSensor";
@@ -685,6 +686,13 @@ export default class Tabs {
   setFov(fov: number) {
     if (this.tabList[this.selectedTab].type === TabType.ThreeDimension) {
       (this.tabList[this.selectedTab].renderer as ThreeDimensionRenderer).setFov(fov);
+    }
+  }
+
+  /** Sets stream settings for the selected 3D field. */
+  setStreamSettings(streamSettings: StreamSettings) {
+    if (this.tabList[this.selectedTab].type === TabType.ThreeDimension) {
+      (this.tabList[this.selectedTab].renderer as ThreeDimensionRenderer).setStreamSettings(streamSettings);
     }
   }
 

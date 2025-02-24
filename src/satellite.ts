@@ -174,6 +174,12 @@ window.addEventListener("message", (event) => {
           }
           break;
 
+        case "edit-stream-settings":
+          if (type === TabType.ThreeDimension) {
+            (renderer as ThreeDimensionRenderer).setStreamSettings(message.data);
+          }
+          break;
+
         default:
           console.warn("Unknown message from main process", message);
           break;

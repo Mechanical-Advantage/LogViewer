@@ -105,6 +105,7 @@ const smallRendererBundles = [
   bundle("unitConversion.ts", "unitConversion.js", false, false),
   bundle("renameTab.ts", "renameTab.js", false, false),
   bundle("editFov.ts", "editFov.js", false, false),
+  bundle("editStream.ts", "editStream.js", false, false),
   bundle("sourceListHelp.ts", "sourceListHelp.js", false, false),
   bundle("betaWelcome.ts", "betaWelcome.js", false, false),
   bundle("export.ts", "export.js", false, false),

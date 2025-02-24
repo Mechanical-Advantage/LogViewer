@@ -881,6 +881,10 @@ async function handleMainMessage(message: NamedMessage) {
       window.tabs.setFov(message.data);
       break;
 
+    case "edit-stream-settings":
+      window.tabs.setStreamSettings(message.data);
+      break;
+
     case "add-table-range":
       window.tabs.addTableRange(message.data.controllerUUID, message.data.rendererUUID, message.data.range);
       break;
