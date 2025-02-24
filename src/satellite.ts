@@ -3,6 +3,7 @@ import NamedMessage from "./shared/NamedMessage";
 import Preferences from "./shared/Preferences";
 import Selection, { SelectionMode } from "./shared/Selection";
 import TabType, { getTabIcon } from "./shared/TabType";
+import CameraStreamRenderer from "./shared/renderers/CameraStreamRenderer";
 import ConsoleRenderer from "./shared/renderers/ConsoleRenderer";
 import DocumentationRenderer from "./shared/renderers/DocumentationRenderer";
 import JoysticksRenderer from "./shared/renderers/JoysticksRenderer";
@@ -92,6 +93,8 @@ function updateVisualizer() {
     case TabType.Points:
       renderer = new PointsRenderer(root);
       break;
+    case TabType.CameraStream:
+      renderer = new CameraStreamRenderer(root);
     case TabType.Metadata:
       renderer = new MetadataRenderer(root);
       break;

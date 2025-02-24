@@ -1849,3 +1849,45 @@ div.points-settings {
     border-left: 1px solid black;
   }
 }
+
+/* CameraStream */
+
+div.camerastream-sources {
+  position: absolute;
+  top: 0%;
+  height: 100%;
+  left: 0%;
+  width: 60%;
+  min-width: calc(100% - 200px);
+}
+
+div.camerastream-settings {
+  position: absolute;
+  top: 0%;
+  height: 100%;
+  right: 0%;
+  width: 40%;
+  max-width: 200px;
+  border-left: 1px solid #ddd;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  div.camerastream-settings {
+    border-left: 1px solid rgb(0, 0, 0);
+  }
+}
+
+div.camerastream-notice {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+}
+
+div.camerastream-notice p {
+  font-size: 15px;
+  text-align: center;
+  margin: 0;
+}

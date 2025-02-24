@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src ws: http: file: blob:"
+      content="default-src 'self'; img-src 'self'; script-src 'self' 'unsafe-eval'; connect-src ws: http: file: blob:"
     />
     <meta
       http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src ws: http: file: blob:"
+      content="default-src 'self'; img-src 'self'; script-src 'self' 'unsafe-eval'; connect-src ws: http: file: blob:"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="global.css" />
@@ -493,8 +493,47 @@
         </div>
       </div>
 
+      <!-- CameraStream -->
+      <div id="controller12">
+        <div class="camerastream-sources"></div>
+        <div class="camerastream-settings setting-blocks">
+          <div class="title">
+            <div class="full">Resolution</div>
+          </div>
+          <div class="input">
+            <div class="half">
+              <input class="resolution-width" type="number" value="900" step="1" />
+            </div>
+            <div class="half">
+              <input class="resolution-height" type="number" value="600" step="1" />
+            </div>
+          </div>
+
+          <div class="title">
+            <div class="full">FPS</div>
+          </div>
+          <div class="input">
+            <input class="fps" type="number" value="-1" step="1" />
+          </div>
+
+          <div class="title">
+            <div class="full">Compression</div>
+          </div>
+          <div class="input">
+            <input class="compression" type="range" min="-1" max="100" value="-1" />
+          </div>
+
+          <div class="title">
+            <div class="full">Streams per Row</div>
+          </div>
+          <div class="input">
+            <input class="columns" type="number" min="1" value="1" />
+          </div>
+        </div>
+      </div>
+
       <!-- Metadata -->
-      <div id="controller12"></div>
+      <div id="controller13"></div>
     </span>
 
     <span id="rendererTemplates" hidden>
@@ -665,8 +704,20 @@
         </div>
       </div>
 
-      <!-- Metadata -->
+      <!-- CameraStream -->
       <div id="renderer12">
+        <div class="camerastream-background-container">
+          <div class="camerastream-viewbox">
+            <div class="camerastream-container"></div>
+          </div>
+          <div class="camerastream-notice">
+            <p>Camera Streams are always live and do not support replays.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metadata -->
+      <div id="renderer13">
         <div class="tab-centered">No metadata found. Check the documentation for details on metadata publishing.</div>
         <div class="metadata-table-container" hidden>
           <table class="metadata-table">

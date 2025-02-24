@@ -816,6 +816,74 @@ div.points-background svg {
   stroke-width: 5px;
 }
 
+/* CameraStream */
+
+div.camerastream-background-container {
+  position: absolute;
+  bottom: 0%;
+  height: calc(100% + 10px);
+  left: 0px;
+  width: 100%;
+}
+
+body.satellite div.camerastream-background-container {
+  height: 100%;
+}
+
+div.camerastream-viewbox {
+  height: calc(100% - 55px);
+  width: calc(100% - 30px);
+  margin: 15px;
+}
+
+body.satellite div.camerastream-viewbox {
+  height: calc(100% - 20px);
+  width: calc(100% - 20px);
+  margin: 10px;
+}
+
+div.camerastream-container {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(1, minmax(0, 1fr));
+  gap: 10px;
+}
+
+div.camerastream-container div.camerastream-viewer {
+  border: 1px solid #000;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  div.camerastream-container div.camerastream-viewer {
+    border: 1px solid #999;
+  }
+}
+
+div.camerastream-container div.camerastream-viewer p {
+  position: absolute;
+  margin: 0;
+  font-family: monospace;
+  color: #292929;
+  background-color: #cccccc;
+}
+
+@media (prefers-color-scheme: dark) {
+  div.camerastream-container div.camerastream-viewer {
+    background-color: #292929;
+    border: 1px solid #cccccc;
+  }
+}
+
+div.camerastream-container div.camerastream-viewer img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* Metadata */
 
 div.metadata-table-container {
